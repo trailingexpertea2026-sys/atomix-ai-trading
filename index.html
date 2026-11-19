@@ -3,122 +3,176 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AToMiX AI TRADING V3.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AToMiX AI TRADING V3.1</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090909;color:#eee;font-family:Arial,sans-serif}
-header{padding:22px 16px;background:#151010;border-bottom:2px solid #c51b2b}
-h1{margin:0;color:#ff3448;font-size:25px}
-.sub{color:#aaa;font-size:12px;margin-top:6px}
-main{max-width:1000px;margin:auto;padding:16px}
-.panel{background:#151515;border:1px solid #382326;border-radius:13px;padding:17px;margin:14px 0}
-.heading{color:#ff5362;font-weight:bold;margin-bottom:12px}
-.status{font-weight:bold;color:#aaa}
-.dot{color:#35e88a}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.metric{background:#202020;padding:15px;border-radius:10px}
+body{margin:0;background:#080808;color:#eee;font-family:Arial,sans-serif}
+header{padding:22px;background:#160b0d;border-bottom:2px solid #d21e32}
+h1{margin:0;color:#ff344b;font-size:25px}
+.sub{color:#aaa;font-size:12px;margin-top:7px}
+main{max-width:1000px;margin:auto;padding:15px}
+.panel{background:#151515;border:1px solid #432127;border-radius:13px;padding:17px;margin:14px 0}
+.heading{color:#ff5264;font-weight:bold;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.metric{background:#202020;border-radius:9px;padding:14px}
 .metric small{color:#aaa}
-.metric strong{display:block;margin-top:8px;font-size:19px}
-button{background:#b8172b;color:white;border:0;padding:13px 18px;border-radius:8px;font-weight:bold}
+.metric strong{display:block;margin-top:9px;font-size:18px}
+.status{font-weight:bold;color:#35e88a}
 .note{font-size:12px;color:#aaa;line-height:1.6}
-iframe{width:100%;height:380px;border:0;border-radius:9px}
-footer{text-align:center;color:#777;font-size:11px;padding:25px}
+button{background:#b8172b;color:white;border:0;padding:13px 18px;border-radius:8px;font-weight:bold}
+iframe{width:100%;height:400px;border:0}
+footer{text-align:center;color:#777;padding:25px;font-size:11px}
 </style>
 </head>
 <body>
 <header>
 <h1>AToMiX ☆ AI TRADING</h1>
-<div class="sub">PREMIUM ANALYSIS SYSTEM · VERSION 3.0</div>
+<div class="sub">PREMIUM ANALYSIS ENGINE · VERSION 3.1</div>
 </header>
+
 <main>
-<div class="panel">
+<section class="panel">
 <div class="heading">SYSTEM CONNECTION</div>
 <div id="apiStatus" class="status">● CHECKING...</div>
-<div class="sub" id="apiInfo">Checking Cloudflare connection...</div>
-</div>
+<div id="apiInfo" class="sub">Connecting Cloudflare API</div>
+</section>
 
-<div class="panel">
+<section class="panel">
 <div class="heading">MARKET OVERVIEW</div>
 <div class="grid">
 <div class="metric"><small>SYMBOL</small><strong>XAUUSD</strong></div>
-<div class="metric"><small>DATA MODE</small><strong>READ ONLY</strong></div>
-<div class="metric"><small>MARKET PRICE</small><strong id="price">NOT AVAILABLE</strong></div>
+<div class="metric"><small>MODE</small><strong>READ ONLY</strong></div>
+<div class="metric"><small>MARKET PRICE</small><strong id="price">UNAVAILABLE</strong></div>
 <div class="metric"><small>DATA STATUS</small><strong id="dataStatus">NOT CONNECTED</strong></div>
 </div>
-</div>
+</section>
 
-<div class="panel">
-<div class="heading">XAUUSD LIVE CHART</div>
+<section class="panel">
+<div class="heading">XAUUSD MARKET CHART</div>
 <div id="tradingview_chart"></div>
-</div>
+</section>
 
-<div class="panel">
-<div class="heading">AI ANALYSIS CENTER</div>
-<p id="analysis">Menunggu sumber data pasaran yang sah untuk analisis.</p>
-<button onclick="checkAPI()">CHECK CONNECTION</button>
-<p class="note">Analisis pendidikan sahaja. Tiada arahan beli/jual dan tiada transaksi automatik.</p>
+<section class="panel">
+<div class="heading">AI TECHNICAL ANALYSIS</div>
+<div class="grid">
+<div class="metric"><small>RSI 14</small><strong id="rsi">--</strong></div>
+<div class="metric"><small>EMA 20</small><strong id="ema20">--</strong></div>
+<div class="metric"><small>EMA 50</small><strong id="ema50">--</strong></div>
+<div class="metric"><small>MACD</small><strong id="macd">--</strong></div>
 </div>
+<p id="analysis" class="note">Menunggu data candle sebenar. Indikator belum dikira.</p>
+<p class="note">Indikator akan dikira apabila data candle yang sah dibekalkan. Tiada data simulasi dipaparkan sebagai data live.</p>
+</section>
 
-<div class="panel">
-<div class="heading">SYSTEM INFORMATION</div>
-<p class="note">AToMiX API: Cloudflare Worker</p>
-<p class="note">Engine: Read-only architecture</p>
-<p class="note">Market feed: Belum disambungkan</p>
-</div>
+<section class="panel">
+<div class="heading">SYSTEM CONTROL</div>
+<button onclick="checkSystem()">CHECK SYSTEM</button>
+<p class="note">AToMiX V3.1 · Read-only educational analysis · No automated orders</p>
+</section>
 </main>
+
 <footer>AToMiX AI TRADING © 2026</footer>
 
 <script>
 const API="https://atomix-live-api.trailingexpertea2026.workers.dev";
 
-async function checkAPI(){
+async function checkSystem(){
  const status=document.getElementById("apiStatus");
  const info=document.getElementById("apiInfo");
  try{
-  const r=await fetch(API+"/health");
-  const d=await r.json();
-  if(!r.ok || d.status!=="online") throw new Error("Offline");
-  status.innerHTML='<span class="dot">● ONLINE</span>';
-  info.textContent="Cloudflare API connected · Version "+d.version;
+  const response=await fetch(API+"/health");
+  const data=await response.json();
+  if(!response.ok || data.status!=="online") throw Error("Offline");
+  status.textContent="● ONLINE";
+  status.style.color="#35e88a";
+  info.textContent="Cloudflare connected · Version "+data.version;
  }catch(e){
   status.textContent="● OFFLINE";
-  status.style.color="#ff5362";
-  info.textContent="Unable to connect to API";
+  status.style.color="#ff5364";
+  info.textContent="API connection unavailable";
  }
 }
 
 async function checkMarket(){
  try{
-  const r=await fetch(API+"/market");
-  const d=await r.json();
-  document.getElementById("dataStatus").textContent=d.data_status.toUpperCase();
+  const response=await fetch(API+"/market");
+  const data=await response.json();
+  document.getElementById("dataStatus").textContent=
+    (data.data_status||"unavailable").toUpperCase();
   document.getElementById("price").textContent=
-    d.price===null?"NOT AVAILABLE":d.price;
+    data.price==null?"UNAVAILABLE":data.price;
  }catch(e){
   document.getElementById("dataStatus").textContent="OFFLINE";
  }
 }
 
-checkAPI();
+function calculateEMA(values,period){
+ if(values.length<period)return null;
+ let result=values.slice(0,period).reduce((a,b)=>a+b,0)/period;
+ const k=2/(period+1);
+ for(let i=period;i<values.length;i++)
+  result=values[i]*k+result*(1-k);
+ return result;
+}
+
+function calculateRSI(values,period=14){
+ if(values.length<=period)return null;
+ let gain=0,loss=0;
+ for(let i=1;i<=period;i++){
+  const d=values[i]-values[i-1];
+  if(d>0)gain+=d;else loss-=d;
+ }
+ let avgGain=gain/period,avgLoss=loss/period;
+ for(let i=period+1;i<values.length;i++){
+  const d=values[i]-values[i-1];
+  avgGain=(avgGain*(period-1)+Math.max(d,0))/period;
+  avgLoss=(avgLoss*(period-1)+Math.max(-d,0))/period;
+ }
+ if(avgLoss===0)return 100;
+ return 100-100/(1+avgGain/avgLoss);
+}
+
+function calculateIndicators(closes){
+ if(!Array.isArray(closes)||closes.length<50||
+    !closes.every(v=>Number.isFinite(v)&&v>0)){
+  return {status:"insufficient_data"};
+ }
+ const rsi=calculateRSI(closes);
+ const ema20=calculateEMA(closes,20);
+ const ema50=calculateEMA(closes,50);
+ const macd=calculateEMA(closes,12)-calculateEMA(closes,26);
+ return {
+  status:"calculated",
+  rsi14:rsi,
+  ema20:ema20,
+  ema50:ema50,
+  macd:macd
+ };
+}
+
+window.AToMiX={
+ calculateIndicators
+};
+
+checkSystem();
 checkMarket();
-setInterval(checkAPI,30000);
+setInterval(checkSystem,30000);
 setInterval(checkMarket,30000);
 </script>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
 new TradingView.widget({
- "autosize":true,
- "symbol":"OANDA:XAUUSD",
- "interval":"15",
- "timezone":"Asia/Kuala_Lumpur",
- "theme":"dark",
- "style":"1",
- "locale":"en",
- "enable_publishing":false,
- "allow_symbol_change":true,
- "container_id":"tradingview_chart"
+ autosize:true,
+ symbol:"OANDA:XAUUSD",
+ interval:"15",
+ timezone:"Asia/Kuala_Lumpur",
+ theme:"dark",
+ style:"1",
+ locale:"en",
+ allow_symbol_change:true,
+ container_id:"tradingview_chart"
 });
 </script>
 </body>
