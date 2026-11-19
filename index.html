@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AToMiX AI Trading</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#090b10;color:white;
+ font-family:Arial,sans-serif;padding:20px;
+}
+header{display:flex;align-items:center;gap:12px}
+.logo{
+ background:#ff3030;color:white;padding:13px;
+ border-radius:12px;font-weight:bold;font-size:22px;
+}
+h2{margin:0;font-size:18px}
+small{color:#9299a8}
+.card{
+ background:#151923;border:1px solid #292e3b;
+ border-radius:16px;padding:18px;margin-top:18px;
+}
+.price{font-size:30px;font-weight:bold;margin:12px 0}
+.red{color:#ff4242}
+.green{color:#20d994}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:#202634;padding:15px;border-radius:12px}
+.stat p{color:#9299a8;font-size:12px}
+.signal{
+ text-align:center;padding:22px;
+ border:1px solid #353b49;border-radius:14px;
+ margin-top:15px;
+}
+.signal h1{font-size:30px;margin:12px}
+button{
+ background:#ff3030;color:white;border:0;
+ padding:14px;border-radius:10px;width:100%;
+ font-weight:bold;margin-top:15px;
+}
+footer{text-align:center;color:#727989;font-size:11px;margin-top:25px}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">A</div>
+ <div>
+  <h2>AToMiX AI TRADING</h2>
+  <small>AI Market Intelligence</small>
+ </div>
+</header>
+
+<div class="card">
+ <small>MARKET WATCH</small>
+ <h2>XAUUSD / GOLD</h2>
+ <div class="price" id="price">2350.00</div>
+ <small>SIMULATED MARKET DATA</small>
+</div>
+
+<div class="grid">
+ <div class="card stat">
+  <p>TIMEFRAME</p>
+  <h2>M15</h2>
+ </div>
+ <div class="card stat">
+  <p>MARKET TREND</p>
+  <h2 class="green">NEUTRAL</h2>
+ </div>
+ <div class="card stat">
+  <p>RSI</p>
+  <h2 id="rsi">50.0</h2>
+ </div>
+ <div class="card stat">
+  <p>EMA</p>
+  <h2>WAIT</h2>
+ </div>
+</div>
+
+<div class="card">
+ <small>AI ANALYSIS CENTER</small>
+ <div class="signal">
+  <small>CURRENT ANALYSIS</small>
+  <h1 id="signal">WAIT</h1>
+  <p id="description">
+   Menunggu data pasaran untuk dianalisis.
+  </p>
+ </div>
+ <button onclick="analyze()">RUN AI SIMULATION</button>
+</div>
+
+<div class="card">
+ <h2>System Status</h2>
+ <p class="green">● Dashboard Online</p>
+ <p class="red">● TradingView: Not Connected</p>
+ <p class="red">● MT5: Not Connected</p>
+ <p class="red">● Notifications: Not Connected</p>
+</div>
+
+<footer>
+ AToMiX AI TRADING © 2026<br>
+ Educational Simulation Only
+</footer>
+
+<script>
+function analyze(){
+ const rsi=Math.random()*100;
+ document.getElementById("rsi").textContent=rsi.toFixed(1);
+
+ let signal="WAIT";
+ let description="Tiada keadaan simulasi yang memenuhi kriteria.";
+
+ if(rsi<30){
+  signal="BUY WATCH";
+  description="RSI rendah. Perlu pengesahan trend sebelum membuat keputusan.";
+ }else if(rsi>70){
+  signal="SELL WATCH";
+  description="RSI tinggi. Perlu pengesahan trend sebelum membuat keputusan.";
+ }
+
+ document.getElementById("signal").textContent=signal;
+ document.getElementById("description").textContent=description;
+ document.getElementById("price").textContent=
+ (2350+Math.random()*10).toFixed(2);
+}
+</script>
+
+</body>
+</html>
