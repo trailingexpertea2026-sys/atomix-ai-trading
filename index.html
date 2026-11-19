@@ -147,6 +147,24 @@ function runAnalysis(){
  document.getElementById("signal").textContent=signal;
  document.getElementById("message").textContent=message;
 }
+<script>
+async function checkAtomixAPI() {
+  try {
+    const response = await fetch(
+      "https://atomix-live-api.trailingexpertea2026.workers.dev/health"
+    );
+
+    const data = await response.json();
+    console.log("AToMiX API:", data);
+
+    return data.status === "online";
+  } catch (error) {
+    console.error("API connection failed:", error);
+    return false;
+  }
+}
+
+checkAtomixAPI();
 </script>
 
 </body>
