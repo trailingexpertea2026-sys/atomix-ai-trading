@@ -3,25 +3,24 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AToMiX AI TRADING V3.2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AToMiX AI TRADING V3.3</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090909;color:#eee;font-family:Arial,sans-serif}
-header{padding:22px 16px;background:#180b0e;border-bottom:2px solid #d21d35}
-h1{color:#ff4055;margin:0;font-size:25px}
+body{margin:0;background:#080808;color:#eee;font-family:Arial,sans-serif}
+header{background:#190b0e;padding:22px 16px;border-bottom:2px solid #d21d35}
+h1{margin:0;color:#ff4055;font-size:25px}
 .sub{font-size:12px;color:#aaa;margin-top:7px}
 main{max-width:950px;margin:auto;padding:15px}
 .panel{background:#151515;border:1px solid #45212a;border-radius:13px;padding:17px;margin:14px 0}
 .heading{color:#ff5266;font-weight:bold;margin-bottom:14px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.metric{background:#202020;padding:14px;border-radius:9px}
+.metric{background:#202020;padding:14px;border-radius:9px;min-width:0}
 .metric small{color:#aaa}
 .metric strong{display:block;font-size:19px;margin-top:8px;overflow-wrap:anywhere}
 .status{color:#35e88a;font-weight:bold}
 .note{font-size:12px;color:#aaa;line-height:1.6}
-textarea{width:100%;min-height:110px;background:#090909;color:#eee;border:1px solid #555;border-radius:8px;padding:12px}
-button{background:#bd1930;color:white;border:0;border-radius:8px;padding:13px 17px;font-weight:bold;margin-top:10px}
+button{background:#bd1930;color:white;border:0;border-radius:8px;padding:13px 17px;font-weight:bold;margin:5px 3px 5px 0}
 iframe{width:100%;height:390px;border:0}
 footer{text-align:center;color:#777;padding:25px;font-size:11px}
 </style>
@@ -29,14 +28,14 @@ footer{text-align:center;color:#777;padding:25px;font-size:11px}
 <body>
 <header>
 <h1>AToMiX ☆ AI TRADING</h1>
-<div class="sub">PREMIUM ANALYSIS ENGINE · VERSION 3.2</div>
+<div class="sub">PREMIUM AI ANALYSIS · VERSION 3.3</div>
 </header>
-
 <main>
+
 <section class="panel">
 <div class="heading">SYSTEM CONNECTION</div>
 <div id="apiStatus" class="status">● CHECKING...</div>
-<div id="apiInfo" class="sub">Connecting to Cloudflare</div>
+<div id="apiInfo" class="sub">Connecting Cloudflare API</div>
 </section>
 
 <section class="panel">
@@ -50,36 +49,36 @@ footer{text-align:center;color:#777;padding:25px;font-size:11px}
 </section>
 
 <section class="panel">
-<div class="heading">XAUUSD CHART</div>
+<div class="heading">XAUUSD MARKET CHART</div>
 <div id="tradingview_chart"></div>
-<p class="note">Carta pihak ketiga. Data carta tidak dihantar secara automatik ke enjin indikator AToMiX.</p>
+<p class="note">Carta TradingView berasingan daripada enjin indikator AToMiX.</p>
 </section>
 
 <section class="panel">
-<div class="heading">TECHNICAL INDICATORS</div>
+<div class="heading">AI TECHNICAL ANALYSIS</div>
 <div class="grid">
 <div class="metric"><small>RSI 14</small><strong id="rsi">--</strong></div>
 <div class="metric"><small>EMA 20</small><strong id="ema20">--</strong></div>
 <div class="metric"><small>EMA 50</small><strong id="ema50">--</strong></div>
 <div class="metric"><small>MACD</small><strong id="macd">--</strong></div>
 </div>
-<p id="analysis" class="note">Menunggu data candle yang sah.</p>
+<p id="analysis" class="note">Menunggu pengiraan.</p>
 </section>
 
 <section class="panel">
-<div class="heading">CANDLE DATA INPUT</div>
-<p class="note">Masukkan sekurang-kurangnya 50 harga penutupan (close) dalam format JSON. Data ini akan dianggap sebagai input manual, bukan harga LIVE.</p>
-<textarea id="candleInput" placeholder='Contoh format: [2300.1,2301.2,2300.8,...]'></textarea>
-<button onclick="runAnalysis()">ANALYZE DATA</button>
-<button onclick="clearAnalysis()">CLEAR</button>
-<p id="inputStatus" class="note">Belum ada data dianalisis.</p>
+<div class="heading">AUTOMATIC ENGINE TEST</div>
+<p class="note">Ujian menggunakan data simulasi sahaja, bukan harga pasaran sebenar.</p>
+<button onclick="runTest()">RUN AUTOMATIC TEST</button>
+<button onclick="resetTest()">RESET</button>
+<div id="testStatus" class="note">Ujian belum dijalankan.</div>
 </section>
 
 <section class="panel">
 <div class="heading">SYSTEM INFORMATION</div>
 <p class="note">Engine: RSI 14 · EMA 20 · EMA 50 · MACD 12/26/9</p>
-<p class="note">Data mode: User-supplied / Read-only</p>
-<p class="note">Tiada transaksi automatik atau arahan beli/jual.</p>
+<p class="note">Data: Simulation or user-supplied</p>
+<p class="note">Market feed: Not connected</p>
+<p class="note">Tiada transaksi automatik atau arahan trading.</p>
 </section>
 </main>
 
@@ -89,43 +88,41 @@ footer{text-align:center;color:#777;padding:25px;font-size:11px}
 const API="https://atomix-live-api.trailingexpertea2026.workers.dev";
 
 async function checkAPI(){
+ const status=document.getElementById("apiStatus");
+ const info=document.getElementById("apiInfo");
  try{
   const r=await fetch(API+"/health");
   const d=await r.json();
   if(!r.ok||d.status!=="online")throw Error();
-  document.getElementById("apiStatus").textContent="● ONLINE";
-  document.getElementById("apiInfo").textContent="Cloudflare API connected · V"+d.version;
+  status.textContent="● ONLINE";
+  status.style.color="#35e88a";
+  info.textContent="Cloudflare connected · V"+d.version;
  }catch(e){
-  document.getElementById("apiStatus").textContent="● OFFLINE";
-  document.getElementById("apiStatus").style.color="#ff5266";
-  document.getElementById("apiInfo").textContent="API unavailable";
+  status.textContent="● OFFLINE";
+  status.style.color="#ff5266";
+  info.textContent="API unavailable";
  }
 }
 
-function emaSeries(values,period){
- if(values.length<period)return [];
- let e=values.slice(0,period).reduce((a,b)=>a+b,0)/period;
- let out=Array(period-1).fill(null);
- out.push(e);
- const k=2/(period+1);
- for(let i=period;i<values.length;i++){
-  e=values[i]*k+e*(1-k);
-  out.push(e);
- }
- return out;
+function ema(values,p){
+ if(values.length<p)return null;
+ let e=values.slice(0,p).reduce((a,b)=>a+b,0)/p;
+ const k=2/(p+1);
+ for(let i=p;i<values.length;i++)e=values[i]*k+e*(1-k);
+ return e;
 }
 
-function rsiValue(values,p=14){
+function rsi(values,p=14){
  if(values.length<=p)return null;
- let gains=0,losses=0;
+ let g=0,l=0;
  for(let i=1;i<=p;i++){
-  let d=values[i]-values[i-1];
-  gains+=Math.max(d,0);
-  losses+=Math.max(-d,0);
+  const d=values[i]-values[i-1];
+  g+=Math.max(d,0);
+  l+=Math.max(-d,0);
  }
- let ag=gains/p,al=losses/p;
+ let ag=g/p,al=l/p;
  for(let i=p+1;i<values.length;i++){
-  let d=values[i]-values[i-1];
+  const d=values[i]-values[i-1];
   ag=(ag*(p-1)+Math.max(d,0))/p;
   al=(al*(p-1)+Math.max(-d,0))/p;
  }
@@ -133,58 +130,53 @@ function rsiValue(values,p=14){
  return 100-100/(1+ag/al);
 }
 
-function calculate(values){
- const e20=emaSeries(values,20);
- const e50=emaSeries(values,50);
- const e12=emaSeries(values,12);
- const e26=emaSeries(values,26);
- const macdLine=values.map((v,i)=>
-  e12[i]===null||e26[i]===null?null:e12[i]-e26[i]);
- const valid=macdLine.filter(v=>v!==null);
- const signal=emaSeries(valid,9);
- const macd=valid.length?valid[valid.length-1]:null;
- const signalValue=signal.length?signal[signal.length-1]:null;
+function indicators(values){
+ if(!Array.isArray(values)||values.length<50||
+ !values.every(v=>Number.isFinite(v)&&v>0))
+ throw Error("Data tidak sah atau kurang daripada 50 nilai.");
  return {
-  rsi:rsiValue(values),
-  ema20:e20.at(-1),
-  ema50:e50.at(-1),
-  macd,
-  signal:signalValue
+  rsi:rsi(values),
+  ema20:ema(values,20),
+  ema50:ema(values,50),
+  macd:ema(values,12)-ema(values,26)
  };
 }
 
-function runAnalysis(){
- const status=document.getElementById("inputStatus");
+function display(result,label){
+ document.getElementById("rsi").textContent=result.rsi.toFixed(2);
+ document.getElementById("ema20").textContent=result.ema20.toFixed(4);
+ document.getElementById("ema50").textContent=result.ema50.toFixed(4);
+ document.getElementById("macd").textContent=result.macd.toFixed(4);
+ document.getElementById("source").textContent=label;
+ document.getElementById("updated").textContent=new Date().toLocaleTimeString();
+ document.getElementById("analysis").textContent=
+ "Pengiraan selesai. Indikator ialah ukuran teknikal, bukan ramalan atau arahan trading.";
+}
+
+function runTest(){
  try{
-  const values=JSON.parse(document.getElementById("candleInput").value);
-  if(!Array.isArray(values)||values.length<50||
-     !values.every(v=>typeof v==="number"&&Number.isFinite(v)&&v>0)){
-   throw Error("Masukkan sekurang-kurangnya 50 nombor harga yang sah.");
-  }
-  const x=calculate(values);
-  document.getElementById("rsi").textContent=x.rsi.toFixed(2);
-  document.getElementById("ema20").textContent=x.ema20.toFixed(4);
-  document.getElementById("ema50").textContent=x.ema50.toFixed(4);
-  document.getElementById("macd").textContent=x.macd.toFixed(4);
-  document.getElementById("source").textContent="MANUAL INPUT";
-  document.getElementById("updated").textContent=new Date().toLocaleTimeString();
-  document.getElementById("analysis").textContent=
-   "Pengiraan selesai. RSI mengukur momentum; EMA membandingkan trend; MACD mengukur perbezaan momentum. Ini bukan ramalan atau arahan trading.";
-  status.textContent="Berjaya mengira "+values.length+" nilai penutupan. Data bukan LIVE.";
+  const sample=Array.from({length:80},(_,i)=>
+   2300+i*0.25+Math.sin(i/3)*1.8
+  );
+  const result=indicators(sample);
+  display(result,"SIMULATION");
+  document.getElementById("testStatus").textContent=
+   "UJIAN BERJAYA · RSI, EMA20, EMA50 dan MACD berjaya dikira menggunakan 80 nilai simulasi.";
  }catch(e){
-  status.textContent=e.message||"Format data tidak sah.";
+  document.getElementById("testStatus").textContent="UJIAN GAGAL: "+e.message;
  }
 }
 
-function clearAnalysis(){
- document.getElementById("candleInput").value="";
+function resetTest(){
  ["rsi","ema20","ema50","macd"].forEach(id=>
   document.getElementById(id).textContent="--");
  document.getElementById("source").textContent="NOT CONNECTED";
  document.getElementById("updated").textContent="--";
- document.getElementById("inputStatus").textContent="Data dibersihkan.";
- document.getElementById("analysis").textContent="Menunggu data candle yang sah.";
+ document.getElementById("testStatus").textContent="Ujian direset.";
+ document.getElementById("analysis").textContent="Menunggu pengiraan.";
 }
+
+window.AToMiX={calculateIndicators:indicators};
 
 checkAPI();
 setInterval(checkAPI,30000);
