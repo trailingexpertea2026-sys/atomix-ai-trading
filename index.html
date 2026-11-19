@@ -3,39 +3,40 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AToMiX AI TRADING V3.1</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AToMiX AI TRADING V3.2</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#080808;color:#eee;font-family:Arial,sans-serif}
-header{padding:22px;background:#160b0d;border-bottom:2px solid #d21e32}
-h1{margin:0;color:#ff344b;font-size:25px}
-.sub{color:#aaa;font-size:12px;margin-top:7px}
-main{max-width:1000px;margin:auto;padding:15px}
-.panel{background:#151515;border:1px solid #432127;border-radius:13px;padding:17px;margin:14px 0}
-.heading{color:#ff5264;font-weight:bold;margin-bottom:14px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.metric{background:#202020;border-radius:9px;padding:14px}
+body{margin:0;background:#090909;color:#eee;font-family:Arial,sans-serif}
+header{padding:22px 16px;background:#180b0e;border-bottom:2px solid #d21d35}
+h1{color:#ff4055;margin:0;font-size:25px}
+.sub{font-size:12px;color:#aaa;margin-top:7px}
+main{max-width:950px;margin:auto;padding:15px}
+.panel{background:#151515;border:1px solid #45212a;border-radius:13px;padding:17px;margin:14px 0}
+.heading{color:#ff5266;font-weight:bold;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{background:#202020;padding:14px;border-radius:9px}
 .metric small{color:#aaa}
-.metric strong{display:block;margin-top:9px;font-size:18px}
-.status{font-weight:bold;color:#35e88a}
+.metric strong{display:block;font-size:19px;margin-top:8px;overflow-wrap:anywhere}
+.status{color:#35e88a;font-weight:bold}
 .note{font-size:12px;color:#aaa;line-height:1.6}
-button{background:#b8172b;color:white;border:0;padding:13px 18px;border-radius:8px;font-weight:bold}
-iframe{width:100%;height:400px;border:0}
+textarea{width:100%;min-height:110px;background:#090909;color:#eee;border:1px solid #555;border-radius:8px;padding:12px}
+button{background:#bd1930;color:white;border:0;border-radius:8px;padding:13px 17px;font-weight:bold;margin-top:10px}
+iframe{width:100%;height:390px;border:0}
 footer{text-align:center;color:#777;padding:25px;font-size:11px}
 </style>
 </head>
 <body>
 <header>
 <h1>AToMiX ☆ AI TRADING</h1>
-<div class="sub">PREMIUM ANALYSIS ENGINE · VERSION 3.1</div>
+<div class="sub">PREMIUM ANALYSIS ENGINE · VERSION 3.2</div>
 </header>
 
 <main>
 <section class="panel">
 <div class="heading">SYSTEM CONNECTION</div>
 <div id="apiStatus" class="status">● CHECKING...</div>
-<div id="apiInfo" class="sub">Connecting Cloudflare API</div>
+<div id="apiInfo" class="sub">Connecting to Cloudflare</div>
 </section>
 
 <section class="panel">
@@ -43,32 +44,42 @@ footer{text-align:center;color:#777;padding:25px;font-size:11px}
 <div class="grid">
 <div class="metric"><small>SYMBOL</small><strong>XAUUSD</strong></div>
 <div class="metric"><small>MODE</small><strong>READ ONLY</strong></div>
-<div class="metric"><small>MARKET PRICE</small><strong id="price">UNAVAILABLE</strong></div>
-<div class="metric"><small>DATA STATUS</small><strong id="dataStatus">NOT CONNECTED</strong></div>
+<div class="metric"><small>DATA SOURCE</small><strong id="source">NOT CONNECTED</strong></div>
+<div class="metric"><small>LAST UPDATE</small><strong id="updated">--</strong></div>
 </div>
 </section>
 
 <section class="panel">
-<div class="heading">XAUUSD MARKET CHART</div>
+<div class="heading">XAUUSD CHART</div>
 <div id="tradingview_chart"></div>
+<p class="note">Carta pihak ketiga. Data carta tidak dihantar secara automatik ke enjin indikator AToMiX.</p>
 </section>
 
 <section class="panel">
-<div class="heading">AI TECHNICAL ANALYSIS</div>
+<div class="heading">TECHNICAL INDICATORS</div>
 <div class="grid">
 <div class="metric"><small>RSI 14</small><strong id="rsi">--</strong></div>
 <div class="metric"><small>EMA 20</small><strong id="ema20">--</strong></div>
 <div class="metric"><small>EMA 50</small><strong id="ema50">--</strong></div>
 <div class="metric"><small>MACD</small><strong id="macd">--</strong></div>
 </div>
-<p id="analysis" class="note">Menunggu data candle sebenar. Indikator belum dikira.</p>
-<p class="note">Indikator akan dikira apabila data candle yang sah dibekalkan. Tiada data simulasi dipaparkan sebagai data live.</p>
+<p id="analysis" class="note">Menunggu data candle yang sah.</p>
 </section>
 
 <section class="panel">
-<div class="heading">SYSTEM CONTROL</div>
-<button onclick="checkSystem()">CHECK SYSTEM</button>
-<p class="note">AToMiX V3.1 · Read-only educational analysis · No automated orders</p>
+<div class="heading">CANDLE DATA INPUT</div>
+<p class="note">Masukkan sekurang-kurangnya 50 harga penutupan (close) dalam format JSON. Data ini akan dianggap sebagai input manual, bukan harga LIVE.</p>
+<textarea id="candleInput" placeholder='Contoh format: [2300.1,2301.2,2300.8,...]'></textarea>
+<button onclick="runAnalysis()">ANALYZE DATA</button>
+<button onclick="clearAnalysis()">CLEAR</button>
+<p id="inputStatus" class="note">Belum ada data dianalisis.</p>
+</section>
+
+<section class="panel">
+<div class="heading">SYSTEM INFORMATION</div>
+<p class="note">Engine: RSI 14 · EMA 20 · EMA 50 · MACD 12/26/9</p>
+<p class="note">Data mode: User-supplied / Read-only</p>
+<p class="note">Tiada transaksi automatik atau arahan beli/jual.</p>
 </section>
 </main>
 
@@ -77,88 +88,106 @@ footer{text-align:center;color:#777;padding:25px;font-size:11px}
 <script>
 const API="https://atomix-live-api.trailingexpertea2026.workers.dev";
 
-async function checkSystem(){
- const status=document.getElementById("apiStatus");
- const info=document.getElementById("apiInfo");
+async function checkAPI(){
  try{
-  const response=await fetch(API+"/health");
-  const data=await response.json();
-  if(!response.ok || data.status!=="online") throw Error("Offline");
-  status.textContent="● ONLINE";
-  status.style.color="#35e88a";
-  info.textContent="Cloudflare connected · Version "+data.version;
+  const r=await fetch(API+"/health");
+  const d=await r.json();
+  if(!r.ok||d.status!=="online")throw Error();
+  document.getElementById("apiStatus").textContent="● ONLINE";
+  document.getElementById("apiInfo").textContent="Cloudflare API connected · V"+d.version;
  }catch(e){
-  status.textContent="● OFFLINE";
-  status.style.color="#ff5364";
-  info.textContent="API connection unavailable";
+  document.getElementById("apiStatus").textContent="● OFFLINE";
+  document.getElementById("apiStatus").style.color="#ff5266";
+  document.getElementById("apiInfo").textContent="API unavailable";
  }
 }
 
-async function checkMarket(){
- try{
-  const response=await fetch(API+"/market");
-  const data=await response.json();
-  document.getElementById("dataStatus").textContent=
-    (data.data_status||"unavailable").toUpperCase();
-  document.getElementById("price").textContent=
-    data.price==null?"UNAVAILABLE":data.price;
- }catch(e){
-  document.getElementById("dataStatus").textContent="OFFLINE";
- }
-}
-
-function calculateEMA(values,period){
- if(values.length<period)return null;
- let result=values.slice(0,period).reduce((a,b)=>a+b,0)/period;
+function emaSeries(values,period){
+ if(values.length<period)return [];
+ let e=values.slice(0,period).reduce((a,b)=>a+b,0)/period;
+ let out=Array(period-1).fill(null);
+ out.push(e);
  const k=2/(period+1);
- for(let i=period;i<values.length;i++)
-  result=values[i]*k+result*(1-k);
- return result;
+ for(let i=period;i<values.length;i++){
+  e=values[i]*k+e*(1-k);
+  out.push(e);
+ }
+ return out;
 }
 
-function calculateRSI(values,period=14){
- if(values.length<=period)return null;
- let gain=0,loss=0;
- for(let i=1;i<=period;i++){
-  const d=values[i]-values[i-1];
-  if(d>0)gain+=d;else loss-=d;
+function rsiValue(values,p=14){
+ if(values.length<=p)return null;
+ let gains=0,losses=0;
+ for(let i=1;i<=p;i++){
+  let d=values[i]-values[i-1];
+  gains+=Math.max(d,0);
+  losses+=Math.max(-d,0);
  }
- let avgGain=gain/period,avgLoss=loss/period;
- for(let i=period+1;i<values.length;i++){
-  const d=values[i]-values[i-1];
-  avgGain=(avgGain*(period-1)+Math.max(d,0))/period;
-  avgLoss=(avgLoss*(period-1)+Math.max(-d,0))/period;
+ let ag=gains/p,al=losses/p;
+ for(let i=p+1;i<values.length;i++){
+  let d=values[i]-values[i-1];
+  ag=(ag*(p-1)+Math.max(d,0))/p;
+  al=(al*(p-1)+Math.max(-d,0))/p;
  }
- if(avgLoss===0)return 100;
- return 100-100/(1+avgGain/avgLoss);
+ if(al===0)return 100;
+ return 100-100/(1+ag/al);
 }
 
-function calculateIndicators(closes){
- if(!Array.isArray(closes)||closes.length<50||
-    !closes.every(v=>Number.isFinite(v)&&v>0)){
-  return {status:"insufficient_data"};
- }
- const rsi=calculateRSI(closes);
- const ema20=calculateEMA(closes,20);
- const ema50=calculateEMA(closes,50);
- const macd=calculateEMA(closes,12)-calculateEMA(closes,26);
+function calculate(values){
+ const e20=emaSeries(values,20);
+ const e50=emaSeries(values,50);
+ const e12=emaSeries(values,12);
+ const e26=emaSeries(values,26);
+ const macdLine=values.map((v,i)=>
+  e12[i]===null||e26[i]===null?null:e12[i]-e26[i]);
+ const valid=macdLine.filter(v=>v!==null);
+ const signal=emaSeries(valid,9);
+ const macd=valid.length?valid[valid.length-1]:null;
+ const signalValue=signal.length?signal[signal.length-1]:null;
  return {
-  status:"calculated",
-  rsi14:rsi,
-  ema20:ema20,
-  ema50:ema50,
-  macd:macd
+  rsi:rsiValue(values),
+  ema20:e20.at(-1),
+  ema50:e50.at(-1),
+  macd,
+  signal:signalValue
  };
 }
 
-window.AToMiX={
- calculateIndicators
-};
+function runAnalysis(){
+ const status=document.getElementById("inputStatus");
+ try{
+  const values=JSON.parse(document.getElementById("candleInput").value);
+  if(!Array.isArray(values)||values.length<50||
+     !values.every(v=>typeof v==="number"&&Number.isFinite(v)&&v>0)){
+   throw Error("Masukkan sekurang-kurangnya 50 nombor harga yang sah.");
+  }
+  const x=calculate(values);
+  document.getElementById("rsi").textContent=x.rsi.toFixed(2);
+  document.getElementById("ema20").textContent=x.ema20.toFixed(4);
+  document.getElementById("ema50").textContent=x.ema50.toFixed(4);
+  document.getElementById("macd").textContent=x.macd.toFixed(4);
+  document.getElementById("source").textContent="MANUAL INPUT";
+  document.getElementById("updated").textContent=new Date().toLocaleTimeString();
+  document.getElementById("analysis").textContent=
+   "Pengiraan selesai. RSI mengukur momentum; EMA membandingkan trend; MACD mengukur perbezaan momentum. Ini bukan ramalan atau arahan trading.";
+  status.textContent="Berjaya mengira "+values.length+" nilai penutupan. Data bukan LIVE.";
+ }catch(e){
+  status.textContent=e.message||"Format data tidak sah.";
+ }
+}
 
-checkSystem();
-checkMarket();
-setInterval(checkSystem,30000);
-setInterval(checkMarket,30000);
+function clearAnalysis(){
+ document.getElementById("candleInput").value="";
+ ["rsi","ema20","ema50","macd"].forEach(id=>
+  document.getElementById(id).textContent="--");
+ document.getElementById("source").textContent="NOT CONNECTED";
+ document.getElementById("updated").textContent="--";
+ document.getElementById("inputStatus").textContent="Data dibersihkan.";
+ document.getElementById("analysis").textContent="Menunggu data candle yang sah.";
+}
+
+checkAPI();
+setInterval(checkAPI,30000);
 </script>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
