@@ -3,43 +3,41 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AToMiX AI Trading</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AToMiX AI TRADING</title>
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;background:#090b10;color:white;
- font-family:Arial,sans-serif;padding:20px;
+ margin:0;padding:18px;background:#090a0e;
+ color:#fff;font-family:Arial,sans-serif
 }
 header{display:flex;align-items:center;gap:12px}
 .logo{
- background:#ff3030;color:white;padding:13px;
- border-radius:12px;font-weight:bold;font-size:22px;
+ background:#ed252f;padding:13px;border-radius:12px;
+ font-size:23px;font-weight:bold
 }
-h2{margin:0;font-size:18px}
-small{color:#9299a8}
+small{color:#8d96a7}
+h2{font-size:17px}
 .card{
- background:#151923;border:1px solid #292e3b;
- border-radius:16px;padding:18px;margin-top:18px;
+ background:#141821;border:1px solid #282e3a;
+ border-radius:15px;padding:16px;margin-top:16px
 }
+.top{display:flex;justify-content:space-between;align-items:center}
+.badge{color:#26d99b;font-size:12px}
 .price{font-size:30px;font-weight:bold;margin:12px 0}
-.red{color:#ff4242}
-.green{color:#20d994}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stat{background:#202634;padding:15px;border-radius:12px}
-.stat p{color:#9299a8;font-size:12px}
-.signal{
- text-align:center;padding:22px;
- border:1px solid #353b49;border-radius:14px;
- margin-top:15px;
-}
-.signal h1{font-size:30px;margin:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#202633;padding:13px;border-radius:10px}
+.stat small{font-size:11px}
+.stat h2{margin:9px 0 0}
+.chart{height:420px;width:100%}
+.signal{text-align:center;padding:15px}
+.signal h1{font-size:32px;color:#ffbf50}
 button{
- background:#ff3030;color:white;border:0;
- padding:14px;border-radius:10px;width:100%;
- font-weight:bold;margin-top:15px;
+ background:#ed252f;color:white;border:0;
+ padding:13px;border-radius:9px;font-weight:bold;
+ width:100%;margin-top:12px
 }
-footer{text-align:center;color:#727989;font-size:11px;margin-top:25px}
+footer{text-align:center;color:#777;font-size:11px;padding:20px}
 </style>
 </head>
 <body>
@@ -47,82 +45,107 @@ footer{text-align:center;color:#727989;font-size:11px;margin-top:25px}
 <header>
  <div class="logo">A</div>
  <div>
-  <h2>AToMiX AI TRADING</h2>
-  <small>AI Market Intelligence</small>
+  <strong>AToMiX AI TRADING</strong><br>
+  <small>AI MARKET INTELLIGENCE</small>
  </div>
 </header>
 
 <div class="card">
- <small>MARKET WATCH</small>
- <h2>XAUUSD / GOLD</h2>
- <div class="price" id="price">2350.00</div>
- <small>SIMULATED MARKET DATA</small>
+ <div class="top">
+  <strong>XAUUSD / GOLD</strong>
+  <span class="badge">● CHART</span>
+ </div>
+ <div class="price">GOLD</div>
+ <small>Live chart provided by TradingView</small>
 </div>
 
-<div class="grid">
- <div class="card stat">
-  <p>TIMEFRAME</p>
-  <h2>M15</h2>
+<div class="card">
+ <div class="top">
+  <strong>MARKET CHART</strong>
+  <small>15 MINUTES</small>
  </div>
- <div class="card stat">
-  <p>MARKET TREND</p>
-  <h2 class="green">NEUTRAL</h2>
- </div>
- <div class="card stat">
-  <p>RSI</p>
-  <h2 id="rsi">50.0</h2>
- </div>
- <div class="card stat">
-  <p>EMA</p>
-  <h2>WAIT</h2>
+ <div class="chart">
+  <div class="tradingview-widget-container"
+       style="height:100%;width:100%">
+   <div class="tradingview-widget-container__widget"
+        style="height:100%;width:100%"></div>
+   <script type="text/javascript"
+    src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
+    async>
+   {
+    "autosize":true,
+    "symbol":"OANDA:XAUUSD",
+    "interval":"15",
+    "timezone":"Asia/Kuala_Lumpur",
+    "theme":"dark",
+    "style":"1",
+    "locale":"en",
+    "allow_symbol_change":false,
+    "calendar":false,
+    "hide_top_toolbar":false,
+    "hide_legend":false,
+    "save_image":false,
+    "support_host":"https://www.tradingview.com"
+   }
+   </script>
+  </div>
  </div>
 </div>
 
 <div class="card">
- <small>AI ANALYSIS CENTER</small>
+ <h2>AI ANALYSIS CENTER</h2>
+ <div class="grid">
+  <div class="stat">
+   <small>RSI SIMULATION</small>
+   <h2 id="rsi">50.0</h2>
+  </div>
+  <div class="stat">
+   <small>MARKET TREND</small>
+   <h2 id="trend">NEUTRAL</h2>
+  </div>
+ </div>
  <div class="signal">
-  <small>CURRENT ANALYSIS</small>
+  <small>SIMULATED SIGNAL</small>
   <h1 id="signal">WAIT</h1>
-  <p id="description">
-   Menunggu data pasaran untuk dianalisis.
-  </p>
+  <p id="message">Tekan butang untuk menjalankan simulasi.</p>
  </div>
- <button onclick="analyze()">RUN AI SIMULATION</button>
+ <button onclick="runAnalysis()">RUN AI SIMULATION</button>
 </div>
 
 <div class="card">
- <h2>System Status</h2>
- <p class="green">● Dashboard Online</p>
- <p class="red">● TradingView: Not Connected</p>
- <p class="red">● MT5: Not Connected</p>
- <p class="red">● Notifications: Not Connected</p>
+ <h2>SYSTEM CONNECTION</h2>
+ <p class="badge">● Dashboard Online</p>
+ <p style="color:#ff6464">● MT5: Not Connected</p>
+ <p style="color:#ff6464">● Webhook: Not Connected</p>
+ <p style="color:#ff6464">● Push Notification: Not Connected</p>
 </div>
 
 <footer>
- AToMiX AI TRADING © 2026<br>
+ AToMiX AI TRADING V2.0<br>
  Educational Simulation Only
 </footer>
 
 <script>
-function analyze(){
+function runAnalysis(){
  const rsi=Math.random()*100;
- document.getElementById("rsi").textContent=rsi.toFixed(1);
-
  let signal="WAIT";
- let description="Tiada keadaan simulasi yang memenuhi kriteria.";
+ let trend="NEUTRAL";
+ let message="Tiada keadaan simulasi yang memenuhi kriteria.";
 
  if(rsi<30){
   signal="BUY WATCH";
-  description="RSI rendah. Perlu pengesahan trend sebelum membuat keputusan.";
+  trend="OVERSOLD";
+  message="RSI simulasi rendah. Tunggu pengesahan.";
  }else if(rsi>70){
   signal="SELL WATCH";
-  description="RSI tinggi. Perlu pengesahan trend sebelum membuat keputusan.";
+  trend="OVERBOUGHT";
+  message="RSI simulasi tinggi. Tunggu pengesahan.";
  }
 
+ document.getElementById("rsi").textContent=rsi.toFixed(1);
+ document.getElementById("trend").textContent=trend;
  document.getElementById("signal").textContent=signal;
- document.getElementById("description").textContent=description;
- document.getElementById("price").textContent=
- (2350+Math.random()*10).toFixed(2);
+ document.getElementById("message").textContent=message;
 }
 </script>
 
